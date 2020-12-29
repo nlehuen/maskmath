@@ -1,4 +1,4 @@
-// custom graph component
+﻿// custom graph component
 Vue.component('graph', {
 
   props: ['traces', 'layout', 'config'],
@@ -200,6 +200,34 @@ Vue.component('p5', {
 
 })
 
+// translation list component
+Vue.component('translation', {
+
+  props: ['list'],
+
+  template: `
+  <h5>
+    <ul id="translation-list">
+      <li v-for="(item, index) in list" :key="item.language">
+        <span v-if="index > 0"> &middot; </span><a :href="item.url">{{item.language}}</a>
+      </li>
+      <li v-if="url == '' || url == 'index.html'">
+        <span> &middot; </span><a href="https://github.com/aatishb/maskmath/issues/4">Add a Translation</a>
+      </li>
+    </ul>
+  </h5>`,
+
+  data: function() {
+    return {
+      url: ''
+    }
+  },
+
+  mounted() {
+    this.url = window.location.href.split('/').pop();
+  }
+})
+
 
 /* main Vue instance */
 let app = new Vue({
@@ -217,7 +245,25 @@ let app = new Vue({
     graphTextColor: 'rgb(255, 190, 137)',
     graphTraceColor: 'rgb(254, 199, 81)',
     expandaside1: false,
-    expandaside2: false
+    expandaside2: false,
+    translations: 
+    [ 
+      { url: 'index.html', language: 'English' },
+      { url: 'index-he.html', language: 'עברית' },
+      { url: 'index-fr.html', language: 'Français' },
+      { url: 'index-it.html', language: 'Italiano' },
+      { url: 'index-pt.html', language: 'Português Brasileiro' },
+      { url: 'index-ru.html', language: 'Русский' },
+      { url: 'index-es.html', language: 'Español' },
+      { url: 'index-el.html', language: 'Ελληνικά' },
+      { url: 'index-cs.html', language: 'Česky' },
+      { url: 'index-uk.html', language: 'Українська' },
+      { url: 'index-id.html', language: 'Bahasa Indonesia' },
+      { url: 'index-fa.html', language: 'فارسی' },
+      { url: 'index-nl.html', language: 'Nederlands' },
+      { url: 'index-ca.html', language: 'Català' },
+      { url: 'index-pl.html', language: 'Polski' },
+    ]
   },
 
   methods: {
@@ -321,6 +367,34 @@ let app = new Vue({
       }
     },
 
+    graph3Traces(percentInfected) {
+      return [
+        {
+          name: percentInfected,
+          x: this.indexArray,
+          y: this.indexArray.map(p => Math.max(1 + gsl_sf_lambert_W0(- this.R0withmask(p) * Math.exp(-this.R0withmask(p)))/this.R0withmask(p), 0) ),
+          type: 'scatter',
+          mode: 'lines',
+          fill: 'tozeroy',
+          fillcolor: 'rgba(255, 50, 50, 0.2)',
+          line: {
+            color: this.graphTraceColor,
+            width: 4
+          }
+        },
+        {
+          x: [0,1],
+          y: [1,1],
+          type: 'scatter',
+          mode: 'lines',
+          fill: 'tonexty',
+          fillcolor: 'rgba(50, 255, 50, 0.2)',
+          line: {color: "transparent"},
+          hoverinfo: 'none'
+        }
+      ]
+    },
+
   },
 
   computed: {
@@ -369,33 +443,7 @@ let app = new Vue({
       ]
     },
 
-    graph3Traces() {
-      return [
-        {
-          name: '% Infected',
-          x: this.indexArray,
-          y: this.indexArray.map(p => Math.max(1 + gsl_sf_lambert_W0(- this.R0withmask(p) * Math.exp(-this.R0withmask(p)))/this.R0withmask(p), 0) ),
-          type: 'scatter',
-          mode: 'lines',
-          fill: 'tozeroy',
-          fillcolor: 'rgba(255, 50, 50, 0.2)',
-          line: {
-            color: this.graphTraceColor,
-            width: 4
-          }
-        },
-        {
-          x: [0,1],
-          y: [1,1],
-          type: 'scatter',
-          mode: 'lines',
-          fill: 'tonexty',
-          fillcolor: 'rgba(50, 255, 50, 0.2)',
-          line: {color: "transparent"},
-          hoverinfo: 'none'
-        }
-      ]
-    },
+    
 
     config() {
       return {
